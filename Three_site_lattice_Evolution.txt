@@ -1,0 +1,48 @@
+%Please create a .m file.
+%The following program demonstrates the time evolution of particles on a lattice model, with the evolution time ranging from t ∈ (0, 50]. The transparent curve in Fig. 2 corresponds to the simulation result at a specific time step.
+
+
+clear all;close all;clc
+N=3;H=zeros(N,N);HV=zeros(N,N);
+NV=500;dV=1/NV;
+T=50;dt=0.01;et=fix(T/dt);
+Pro_Q_T_N=zeros(NV,et,2);
+V([1:NV],1)=-10+20*[1:NV]*dV;
+J=0.1;
+%========================================
+et=fix(T/dt);instate=zeros(N,1);Time=zeros(et,1);
+Time(:,1)=[1:et]*dt;
+%========================================
+for ii=1:1
+    instate(ii,1)=1;
+end
+L=0;
+for V2=[-pi/2,0]
+    L=L+1;
+for v=1:NV
+    for ii=1:N-1
+        HT(ii,ii+1)=J;HT(ii+1,ii)=J;
+    end
+    HV(1,1)=V(v,1);HV(2,2)=V2;HV(3,3)=V(v,1);
+    H=HV+HT;
+    U1=expm(-1i*H*dt);
+%========================================
+WFTn1=zeros(N,et);
+WFTn1(:,1)=instate(:,1);
+for t=1:et
+   WFTn1(:,t+1)=U1*WFTn1(:,t);
+end
+    Pro_Q_T(v,1:et,L)=abs(WFTn1(N,1:et)).^2;
+end
+end
+
+
+
+figure('color','w','position',[400,20,600,600]);
+surf(Time,V,Pro_Q_T(:,:,1))
+shading interp
+grid off
+xlabel('$t$','Fontsize',30,'Interpreter','LaTex')
+ylabel('$V1$','Fontsize',30,'Interpreter','LaTex')
+view(0,90)
+max(max(Pro_Q_T))

@@ -6,13 +6,13 @@ Import["https://qtechtheory.org/questlink.m"]
 CreateDownloadedQuESTEnv[]
 
 
-
-numQb = 4;
+numQb = 2;
 PI = N[\[Pi], 12];
 
 \[Psi]IN = CreateQureg[numQb];
 \[Psi]OUT = CreateQureg[numQb];
 \[Psi]WP = CreateQureg[numQb];
+
 
 circXY[i_, j_, \[Theta]_] := (
   circ = {Subscript[Rz, i][\[Pi]/2], Subscript[H, j], 
@@ -28,20 +28,15 @@ circXY[i_, j_, \[Theta]_] := (
 
 N\[Phi] = 201;
 d\[Phi] = 2 PI/(N\[Phi] - 1);
-\[Theta]1 = PI/1.5;
-\[Theta]2 = PI/1.5;
-\[Alpha] = \[Pi]/4;
+\[Theta] = PI/2;
+\[Alpha] = 0;
 Pro1 = Table[(
     \[Phi] = -PI + (i\[Phi] - 1)*d\[Phi];
-    circ\[Theta] = 
-     Join[circXY[0, 1, \[Theta]1], circXY[1, 2, \[Theta]2], 
-      circXY[2, 3, \[Theta]1]];
+    circ\[Theta] = Join[circXY[0, 1, \[Theta]]];
     circ\[Phi] = {Subscript[Rz, 0][\[Phi]], 
-      Subscript[Rz, 1][\[Alpha]], Subscript[Rz, 2][-\[Alpha]], 
-      Subscript[Rz, 3][\[Phi]]};
+      Subscript[Rz, 1][\[Alpha]]};
     circ = 
-     Join[{Subscript[X, 0]}, circ\[Theta], circ\[Phi], circ\[Theta], 
-      circ\[Phi], circ\[Theta]];
+     Join[{Subscript[X, 0]}, circ\[Theta], circ\[Phi], circ\[Theta]];
     ApplyCircuit[\[Psi]IN, circ, \[Psi]OUT];
     OUT = GetQuregMatrix[\[Psi]OUT];
     Zave = 
@@ -51,18 +46,14 @@ Pro1 = Table[(
     {\[Phi], Pz}
     ), {i\[Phi], N\[Phi]}];
 
-\[Alpha] = -\[Pi]/1.5;
+\[Alpha] = -\[Pi]/2;
 Pro2 = Table[(
     \[Phi] = -PI + (i\[Phi] - 1)*d\[Phi];
-    circ\[Theta] = 
-     Join[circXY[0, 1, \[Theta]1], circXY[1, 2, \[Theta]2], 
-      circXY[2, 3, \[Theta]1]];
+    circ\[Theta] = Join[circXY[0, 1, \[Theta]]];
     circ\[Phi] = {Subscript[Rz, 0][\[Phi]], 
-      Subscript[Rz, 1][\[Alpha]], Subscript[Rz, 2][-\[Alpha]], 
-      Subscript[Rz, 3][\[Phi]]};
+      Subscript[Rz, 1][\[Alpha]]};
     circ = 
-     Join[{Subscript[X, 0]}, circ\[Theta], circ\[Phi], circ\[Theta], 
-      circ\[Phi], circ\[Theta]];
+     Join[{Subscript[X, 0]}, circ\[Theta], circ\[Phi], circ\[Theta]];
     ApplyCircuit[\[Psi]IN, circ, \[Psi]OUT];
     OUT = GetQuregMatrix[\[Psi]OUT];
     Zave = 
