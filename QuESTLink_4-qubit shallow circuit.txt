@@ -1,0 +1,80 @@
+%Please create a .nb file.
+
+
+ClearAll["Global`*"]
+Import["https://qtechtheory.org/questlink.m"]
+CreateDownloadedQuESTEnv[]
+
+
+
+numQb = 4;
+PI = N[\[Pi], 12];
+
+\[Psi]IN = CreateQureg[numQb];
+\[Psi]OUT = CreateQureg[numQb];
+\[Psi]WP = CreateQureg[numQb];
+
+circXY[i_, j_, \[Theta]_] := (
+  circ = {Subscript[Rz, i][\[Pi]/2], Subscript[H, j], 
+    Subscript[C, j][Subscript[X, i]], Subscript[Rz, i][-(\[Pi]/2)], 
+    Subscript[Rz, j][\[Pi]/2], Subscript[H, i], Subscript[H, j], 
+    Subscript[Rz, i][\[Theta]/2], Subscript[Rz, j][-(\[Theta]/2)], 
+    Subscript[Rz, i][PI/2], Subscript[H, j], 
+    Subscript[C, j][Subscript[X, i]], Subscript[Rz, i][-(\[Pi]/2)], 
+    Subscript[Rz, j][\[Pi]/2], Subscript[H, i], Subscript[H, j]};
+  Return[circ]
+  )
+
+
+N\[Phi] = 201;
+d\[Phi] = 2 PI/(N\[Phi] - 1);
+\[Theta]1 = PI/1.5;
+\[Theta]2 = PI/1.5;
+\[Alpha] = \[Pi]/4;
+Pro1 = Table[(
+    \[Phi] = -PI + (i\[Phi] - 1)*d\[Phi];
+    circ\[Theta] = 
+     Join[circXY[0, 1, \[Theta]1], circXY[1, 2, \[Theta]2], 
+      circXY[2, 3, \[Theta]1]];
+    circ\[Phi] = {Subscript[Rz, 0][\[Phi]], 
+      Subscript[Rz, 1][\[Alpha]], Subscript[Rz, 2][-\[Alpha]], 
+      Subscript[Rz, 3][\[Phi]]};
+    circ = 
+     Join[{Subscript[X, 0]}, circ\[Theta], circ\[Phi], circ\[Theta], 
+      circ\[Phi], circ\[Theta]];
+    ApplyCircuit[\[Psi]IN, circ, \[Psi]OUT];
+    OUT = GetQuregMatrix[\[Psi]OUT];
+    Pz = CalcProbOfOutcome[\[Psi]OUT, numQb - 1, 1];
+    {\[Phi], Pz}
+    ), {i\[Phi], N\[Phi]}];
+
+\[Alpha] = -\[Pi]/1.5;
+Pro2 = Table[(
+    \[Phi] = -PI + (i\[Phi] - 1)*d\[Phi];
+    circ\[Theta] = 
+     Join[circXY[0, 1, \[Theta]1], circXY[1, 2, \[Theta]2], 
+      circXY[2, 3, \[Theta]1]];
+    circ\[Phi] = {Subscript[Rz, 0][\[Phi]], 
+      Subscript[Rz, 1][\[Alpha]], Subscript[Rz, 2][-\[Alpha]], 
+      Subscript[Rz, 3][\[Phi]]};
+    circ = 
+     Join[{Subscript[X, 0]}, circ\[Theta], circ\[Phi], circ\[Theta], 
+      circ\[Phi], circ\[Theta]];
+    ApplyCircuit[\[Psi]IN, circ, \[Psi]OUT];
+    OUT = GetQuregMatrix[\[Psi]OUT];
+    Pz = CalcProbOfOutcome[\[Psi]OUT, numQb - 1, 1];
+    {\[Phi], Pz}
+    ), {i\[Phi], N\[Phi]}];
+plot1 = ListLinePlot[Pro1, PlotStyle -> {Orange, Thickness[0.01]}, 
+   PlotRange -> {{-3.2, 3.2}, {0, 1}}, Axes -> Automatic(*{False,
+   False}*), Frame -> True, 
+   FrameLabel -> {"\[Phi]", "\!\(\*SubscriptBox[\(P\), \(0001\)]\)"}, 
+   FrameTicks -> {{Automatic, Automatic}, {Automatic, Automatic}}, 
+   ImageSize -> {460, 460}, LabelStyle -> {FontSize -> 18}];
+plot2 = ListLinePlot[Pro2, PlotStyle -> {Blue, Thickness[0.01]}, 
+   PlotRange -> {{-3.2, 3.2}, {0, 1}}, Axes -> Automatic(*{False,
+   False}*), Frame -> True, 
+   FrameLabel -> {"\[Phi]", "\!\(\*SubscriptBox[\(P\), \(0001\)]\)"}, 
+   FrameTicks -> {{Automatic, Automatic}, {Automatic, Automatic}}, 
+   ImageSize -> {460, 460}, LabelStyle -> {FontSize -> 18}];
+Show[plot1, plot2, AspectRatio -> 1]
